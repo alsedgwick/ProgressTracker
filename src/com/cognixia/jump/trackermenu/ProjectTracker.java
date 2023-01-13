@@ -11,6 +11,8 @@ import com.cognixia.jump.DAO.UserDAOSQL;
 import com.cognixia.jump.DAO.UserShow;
 import com.cognixia.jump.DAO.UserShowDAO;
 import com.cognixia.jump.DAO.UserShowDAOSQL;
+import com.cognixia.jump.exceptions.InvalidMenuChoiceException;
+import com.cognixia.jump.exceptions.InvalidPasswordException;
 
 public class ProjectTracker {
 	
@@ -19,7 +21,7 @@ public class ProjectTracker {
 	private static User currentUser;
 	private static UserShowDAOSQL usd = new UserShowDAOSQL();
 	
-	public static void login(Scanner input) {
+	public static void login(Scanner input) throws InvalidPasswordException {
 		UserDAOSQL uds = new UserDAOSQL();
 		//User user = null;
 		String username = "";
@@ -41,15 +43,16 @@ public class ProjectTracker {
 		password = input.nextLine();
 		
 		if(currentUser.getPassword().equals(password)) {
+			
 			logIn = true;
 			System.out.println("Log in successful!");
 			System.out.print("Hello! ");
-		}else {
-			System.out.println("Password does not match.");
+		}else if(!currentUser.getPassword().equals(password)) {
+			throw new InvalidPasswordException();
 		}
 	}
 	
-	public static void menu(Scanner input) {
+	public static void menu(Scanner input) throws InvalidMenuChoiceException {
 		List<UserShow> shows = usd.getShowByUserId(currentUser.getId());
 		
 		int choice = 0;
@@ -57,15 +60,13 @@ public class ProjectTracker {
 		System.out.println("To edit a show type its number: ");
 		System.out.println("Type 0 to log out");
 		choice = Integer.parseInt(input.nextLine());
-		try {
-			if(choice == 0) {
-				logOut();
-			}else if(choice >= 1 && choice <= shows.size()) {
-					System.out.println(shows.get(choice - 1).getTitle() + " was selected.");
-					edit(choice, input);
-				}
-		}catch(Exception InvalidMenuChoiceException) {
-			
+		if(choice == 0) {
+			logOut();
+		}else if(choice >= 1 && choice <= shows.size()) {
+				System.out.println(shows.get(choice - 1).getTitle() + " was selected.");
+				edit(choice, input);
+		}else if(choice < 1 || choice > shows.size()) {
+			throw new InvalidMenuChoiceException();
 		}
 
 	}
@@ -108,11 +109,26 @@ public class ProjectTracker {
 		Show show = sds.getShowByID(3);
 		System.out.println(show);
 		Scanner input = new Scanner(System.in);
-		login(input);
-		while(logIn == true) {
-			menu(input);
+		try {
+			login(input);
+		} catch (InvalidPasswordException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
 		}
-		login(input);
+		while(logIn == true) {
+			try {
+				menu(input);
+			} catch (InvalidMenuChoiceException e) {
+				// TODO Auto-generated catch block
+				System.out.println(e.getMessage());
+			}
+		}
+		try {
+			login(input);
+		} catch (InvalidPasswordException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+		}
 		input.close();
 	}
 
