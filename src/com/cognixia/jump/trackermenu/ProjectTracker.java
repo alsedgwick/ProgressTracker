@@ -15,8 +15,9 @@ import com.cognixia.jump.DAO.UserShowDAOSQL;
 public class ProjectTracker {
 	
 	private static boolean logIn = false;
-	private static boolean terminate = true;
+	// private static boolean terminate = true;
 	private static User currentUser;
+	private static UserShowDAOSQL usd = new UserShowDAOSQL();
 	
 	public static void login(Scanner input) {
 		UserDAOSQL uds = new UserDAOSQL();
@@ -42,40 +43,58 @@ public class ProjectTracker {
 		if(currentUser.getPassword().equals(password)) {
 			logIn = true;
 			System.out.println("Log in successful!");
+			System.out.print("Hello! ");
 		}else {
 			System.out.println("Password does not match.");
 		}
 	}
 	
 	public static void menu(Scanner input) {
+		List<UserShow> shows = usd.getShowByUserId(currentUser.getId());
+		
 		int choice = 0;
-		System.out.println("Hello! What would you like to do? Type a number: ");
-		System.out.println("1. View shows.");
-		System.out.println("2. Edit shows.");
-		System.out.println("3. Log out");
+		view(currentUser);
+		System.out.println("To edit a show type its number: ");
+		System.out.println("Type 0 to log out");
 		choice = Integer.parseInt(input.nextLine());
-		if(choice == 1) {
-			view(currentUser);
-		}else if(choice == 2) {
-			edit();
-		}else if(choice == 3) {
-			logOut();
-		}else {
-			System.out.println("Not a valid choice.");
+		try {
+			if(choice == 0) {
+				logOut();
+			}else if(choice >= 1 && choice <= shows.size()) {
+					System.out.println(shows.get(choice - 1).getTitle() + " was selected.");
+					edit(choice, input);
+				}
+		}catch(Exception InvalidMenuChoiceException) {
+			
 		}
+
 	}
 	
 	public static void view(User user) {
-		UserShowDAOSQL usd = new UserShowDAOSQL();
+		List<UserShow> shows = usd.getShowByUserId(currentUser.getId());
+		
 		System.out.println("Current Show List: ");
 		System.out.println("------------------");
-		//List<User> user = uds.getAllUsers();
-		List<UserShow> shows = usd.getShowByUserId(user.getId());
-		System.out.println(shows);
+
+		for(int i = 0; i < shows.size(); i++) {
+			System.out.println("Show " + (i + 1) +": " + shows.get(i).getTitle());
+			System.out.println("Status: " + shows.get(i).getLastWatched() + "/" + shows.get(i).getEpisodes() );
+			System.out.print("Percentage watched: ");
+			System.out.printf("%.2f", (((float)(shows.get(i).getLastWatched())  / (float)shows.get(i).getEpisodes()) * 100));
+			System.out.print("%");
+			System.out.println("\n");
+		}
 	}
 	
-	public static void edit() {
-		System.out.println("Edit");	
+	public static void edit(int choice, Scanner input) {
+		List<UserShow> shows = usd.getShowByUserId(currentUser.getId());
+		
+		System.out.println("Enter your last watched episode: ");
+		int lastEpisodeWatched = Integer.parseInt(input.nextLine());
+		
+		usd.updateShowbyShowId(lastEpisodeWatched, currentUser.getId(), choice);
+
+		view(currentUser);
 	}
 	
 	public static void logOut() {
@@ -87,16 +106,13 @@ public class ProjectTracker {
 	public static void main(String[] args) {
 		ShowDAOSQL sds = new ShowDAOSQL();
 		Show show = sds.getShowByID(3);
-		
 		System.out.println(show);
 		Scanner input = new Scanner(System.in);
 		login(input);
-		while(terminate) {
-			if(logIn == true) {
-				menu(input);
-			}else {
-				login(input);
-			}
+		if(logIn == true) {
+			menu(input);
+		}else {
+			login(input);
 		}
 		input.close();
 	}

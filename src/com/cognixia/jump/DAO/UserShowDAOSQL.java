@@ -3,7 +3,9 @@ package com.cognixia.jump.DAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.cognixia.jump.connection.BetterConnectionManager;
@@ -13,42 +15,49 @@ public class UserShowDAOSQL implements UserShowDAO {
 	
 	@Override
 	public List<UserShow> getShowByUserId(int userId) {
-		try {
-			PreparedStatement pstmt = conn.prepareStatement("select user_id, title, last_watched, episodes from user_show us join tv_show ts on ts.show_id = us.show_id where user_id = ?");
-			pstmt.setInt(1, userId);
-
-			ResultSet rs = pstmt.executeQuery();
-			boolean r = pstmt.execute();
-			//System.out.println(rs.getStatement());
-			System.out.println(r);
+		List<UserShow> userShow = new ArrayList<UserShow>();
 		
-			List<UserShow> userShow = null;
+		try {
+			PreparedStatement pstmt = conn.prepareStatement("select user_id, ts.title, last_watched, ts.episodes from user_show us join tv_show ts on ts.show_id = us.show_id where user_id = ?");
+			pstmt.setInt(1, userId);
 			
-			System.out.println("Above printing out rs.next.");
-			System.out.println(rs.next());
-			System.out.println("Below printing out rs.next");
+			ResultSet rs = pstmt.executeQuery();
 
 			while(rs.next()) {
 				int id = rs.getInt("user_id");
-				int sId = rs.getInt("show_id");
 				int episodes = rs.getInt("episodes");
 				String title = rs.getString("title");
 				int lastWatched = rs.getInt("last_watched");
-				//System.out.println("Hello from DAOSQL");
-				//System.out.println(title);
-				userShow.add(new UserShow(id, sId, title, episodes, lastWatched));
-				/*for(int i = 0; i <10; i++) {
-					System.out.println(userShow[i]);
-				}*/
+
+				userShow.add(new UserShow(id, title, episodes, lastWatched));
 			}
+
 			rs.close();
-			return userShow;
+			//return userShow;
 
 		} catch (SQLException e) {
 		
 			System.out.println("UserShow with userid = " + userId + " not found.");
+			System.out.println(e);
 		}
-	return null;
+	return userShow;
+	}
+
+	@Override
+	public int updateShowbyShowId(int showId, int userId, int userInput) {
+		try {
+			PreparedStatement pstmt = conn.prepareStatement("update user_show set last_watched = ? where user_id = ? and show_id = ?");
+			pstmt.setInt(1, userInput);
+			pstmt.setInt(2, userId);
+			pstmt.setInt(3, showId);
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return 0;
 	}
 
 }

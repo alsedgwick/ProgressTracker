@@ -11,10 +11,9 @@ public class UserShow {
 	 * @param showId
 	 * @param lastWatched
 	 */
-	public UserShow(int userId, int showId, String title, int episodes, int lastWatched) {
+	public UserShow(int userId, String title, int episodes, int lastWatched) {
 		super();
 		this.userId = userId;
-		this.showId = showId;
 		this.lastWatched = lastWatched;
 		this.title = title;
 		this.episodes = episodes;
@@ -80,11 +79,12 @@ public class UserShow {
 	public void setEpisodes(int episodes) {
 		this.episodes = episodes;
 	}
-	
 	@Override
 	public String toString() {
-		return "UserShow [userId=" + userId + ", showId=" + showId + ", lastWatched=" + lastWatched + "]";
+		return "UserShow [userId=" + userId + ", title=" + title + ", episodes=" + episodes
+				+ ", lastWatched=" + lastWatched + "]";
 	}
 	
+
 	
 }
