@@ -99,8 +99,8 @@ public class ProjectTracker {
 	
 	public static void logOut() {
 		System.out.println("Logged out, have a nice day!");
+		logIn = false;
 		System.exit(0);
-		//Code to have program terminate here
 	}
 
 	public static void main(String[] args) {
@@ -109,11 +109,10 @@ public class ProjectTracker {
 		System.out.println(show);
 		Scanner input = new Scanner(System.in);
 		login(input);
-		if(logIn == true) {
+		while(logIn == true) {
 			menu(input);
-		}else {
-			login(input);
 		}
+		login(input);
 		input.close();
 	}
 

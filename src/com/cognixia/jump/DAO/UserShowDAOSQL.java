@@ -44,14 +44,13 @@ public class UserShowDAOSQL implements UserShowDAO {
 	}
 
 	@Override
-	public int updateShowbyShowId(int showId, int userId, int userInput) {
-		try {
-			PreparedStatement pstmt = conn.prepareStatement("update user_show set last_watched = ? where user_id = ? and show_id = ?");
+	public int updateShowbyShowId(int userInput, int userId, int showId) {
+		try(PreparedStatement pstmt = conn.prepareStatement("update user_show set last_watched = ? where user_id = ? and show_id = ?");) {
 			pstmt.setInt(1, userInput);
 			pstmt.setInt(2, userId);
 			pstmt.setInt(3, showId);
 			pstmt.executeUpdate();
-			
+		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
