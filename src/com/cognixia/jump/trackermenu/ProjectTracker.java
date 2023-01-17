@@ -107,11 +107,13 @@ public class ProjectTracker {
 	public static void main(String[] args) {
 		ShowDAOSQL sds = new ShowDAOSQL();
 		Scanner input = new Scanner(System.in);
-		try {
-			login(input);
-		} catch (InvalidPasswordException e) {
-			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
+		while(logIn == false) {
+			try {
+				login(input);
+			} catch (InvalidPasswordException e) {
+				// TODO Auto-generated catch block
+				System.out.println(e.getMessage());
+			}
 		}
 		while(logIn == true) {
 			try {
@@ -120,12 +122,6 @@ public class ProjectTracker {
 				// TODO Auto-generated catch block
 				System.out.println(e.getMessage());
 			}
-		}
-		try {
-			login(input);
-		} catch (InvalidPasswordException e) {
-			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
 		}
 		input.close();
 	}
