@@ -106,8 +106,6 @@ public class ProjectTracker {
 
 	public static void main(String[] args) {
 		ShowDAOSQL sds = new ShowDAOSQL();
-		Show show = sds.getShowByID(3);
-		System.out.println(show);
 		Scanner input = new Scanner(System.in);
 		try {
 			login(input);
